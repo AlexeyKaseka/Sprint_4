@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,7 +46,7 @@ public class FaqTest {
         @Test
         public void testFaqCorrectTextOnClick() {
             // веб драйвер для Google Chrome
-            WebDriver driver = new ChromeDriver();
+            WebDriver driver = new FirefoxDriver();
             // открытие главной страницы
             driver.get("https://qa-scooter.praktikum-services.ru/");
             // подключаем MainPage
