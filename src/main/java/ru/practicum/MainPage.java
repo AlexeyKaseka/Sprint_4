@@ -12,13 +12,35 @@ import java.time.Duration;
 // Класс Page Object для главной страницы
 public class MainPage {
     private final WebDriver driver;
+
+    // Конструктор
+    public MainPage(WebDriver driver) {
+        this.driver = driver;
+    }
+
+
+    // Локатор кнопки заказа в шапке
+    private static final By BUTTON_HEAD_ORDER = By.className("Button_Button__ra12g");
+    // Локатор кнопки заказа в теле
+    private static final By BUTTON_BODY_ORDER = By.xpath(".//div[starts-with(@class, 'Home_RoadMap')]//button[starts-with(@class, 'Button_Button')]");
+
+
     // Локатор вопроса
     private static final By FAQ_QUESTION = By.xpath("//div[contains(@id, 'accordion__heading-')]");
     // Локатор ответа
     private static final By FAQ_ANSWER = By.xpath("//div[contains(@id, 'accordion__panel-')]");
-    // Конструктор
-    public MainPage(WebDriver driver) {
-        this.driver = driver;
+
+    // Находим кнопку в шапке и нажимаем на нее
+    public void clickHeaderOrderButton() {
+        driver.findElement(BUTTON_HEAD_ORDER).click();
+        // Скролим до кнопки и жмем в теле страницы
+    }
+
+    public void clickBodyOrderButton() {
+        WebElement button = driver.findElement(BUTTON_BODY_ORDER);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", button);
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.elementToBeClickable(button)).click();
     }
 
     // Метод для скролла к вопросу
@@ -44,7 +66,7 @@ public class MainPage {
         WebElement answer = wait.until(
                 ExpectedConditions.visibilityOf(
                         driver.findElements(FAQ_ANSWER).get(index)
-        ));
+                ));
         return answer.getText();
     }
 

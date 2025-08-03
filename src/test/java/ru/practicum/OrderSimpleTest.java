@@ -1,76 +1,85 @@
 package ru.practicum;
 
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
-import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+@RunWith(Parameterized.class)
 public class OrderSimpleTest {
+
+    private final String name;
+    private final String secondName;
+    private final String address;
+    private final String metro;
+    private final String phone;
+    private final String date;
+    private final int rate;
+    private final String color;
+    private final String comment;
+    private final String expectedOrderText;
+
+    public OrderSimpleTest(String name, String secondName, String address, String metro,
+                           String phone, String date, int rate, String color, String comment, String expectedOrderText) {
+        this.name = name;
+        this.secondName = secondName;
+        this.address = address;
+        this.metro = metro;
+        this.phone = phone;
+        this.date = date;
+        this.rate = rate;
+        this.color = color;
+        this.comment = comment;
+        this.expectedOrderText = expectedOrderText;
+    }
+    @Parameterized.Parameters
+    public static Object[][] testData() {
+        return new Object[][]{
+                {"Петя", "Петров", "Пролетарская, 8", "Рижская", "89166166116", "15.08.2025", 2, "black", "Все ок", "Заказ оформлен"},
+                {"Иван", "Иванов", "Мичурина, 16", "Комсомольская", "89156155116", "10.08.2025", 4, "grey", "Норм", "Заказ оформлен"},
+        };
+        }
+
     @Test
     public void testCorrectPathOrderFirstButton() {
         // веб драйвер для Google Chrome
         WebDriver driver = new FirefoxDriver();
         // открытие главной страницы
         driver.get("https://qa-scooter.praktikum-services.ru/");
-        // Поиск кнопки заказать и кликнуть
-        driver.findElement(By.className("Button_Button__ra12g")).click();
-        // Поиск поля Имя с ожиданием и заполнение поля
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(
-                        By.xpath(".//div/input[contains(@placeholder,'Имя')]")
-                )).sendKeys("Иван");
-        // Поиск поля Фамилия  и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'Фамилия')]")
-        ).sendKeys("Иванов");
-        // Поиск поля Адрес  и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'Адрес')]")
-        ).sendKeys("Фрунзе, 8");
-        // Поиск поля Станция метро  и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'Станция метро')]")
-        ).sendKeys("Рижская");
-        // Ждем появления элементов списка и кликаем
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(By.className("Order_Text__2broi"))).click();
-        // Поиск поля Телефон и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'* Телефон: на него позвонит курьер')]")
-        ).sendKeys("89155151551");
-        // Ищем и жмем кнопку куки
-        driver.findElement(By.className("App_CookieButton__3cvqF")).click();
-        // Ищем и жмем кнопку далее
-        driver.findElement(By.xpath(".//div[starts-with(@class, 'Order_NextButton')]/button")).click();
-        // Ищем поля Календаря и вводим дату
-        WebElement dateField = new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable
-                        (By.xpath(".//div[starts-with(@class, 'react-datepicker__input-container')]//input")));
-        dateField.sendKeys("27.08.2025");
-        driver.findElement(By.className("Header_Header__214zg")).click();
+        MainPage mainPage = new MainPage(driver);
+        OrderPage orderPage = new OrderPage(driver);
+        // Кликаем кнопку Заказать
+        mainPage.clickHeaderOrderButton();
+        // Пишем Имя
+        orderPage.setName(name);
+        // Пишем Фамилию
+        orderPage.setSecondName(secondName);
+        // Пишем адрес
+        orderPage.setAdrdess(address);
+        // Выбираем станцию Метро
+        orderPage.setMetro(metro);
+        // Пишем номер
+        orderPage.setPhone(phone);
+        // Жмем кнопку куки
+        orderPage.clickCookie();
+        // Жмем кнопку далее
+        orderPage.clickGo();
+        // Пишем дату
+        orderPage.setData(date);
         // Ищем поле Срок аренды
-        driver.findElement(By.className("Dropdown-root")).click();
-        // выбираем срок аренды
-        driver.findElement(By.xpath("//div[@class='Dropdown-option' and text()='трое суток']")).click();
-        // Поле цвет самоката, выбираем цвет
-        driver.findElement(By.id("black")).click();
+        orderPage.setRent(rate);
+        // Выбор цвета
+        orderPage.setColor(color);
+        // Пишем комментарий
+        orderPage.setComment(comment);
         // Нажимаем на кнопку заказать
-        driver.findElement(By.xpath("//button[@class='Button_Button__ra12g Button_Middle__1CSJM' and text()='Заказать']")).click();
+        orderPage.clickOrder();
         // Подтверждаем заказ
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@class='Button_Button__ra12g Button_Middle__1CSJM' and text()='Да']"))).click();
-// Проверяем текст заголовка напрямую
-        assertTrue(new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        By.className("Order_Modal__YZ-d3")
-                )).isDisplayed());
+        orderPage.clickConfirmOrder();
+        // Проверяем что заказ оформлен
+        orderPage.checkingOrderPage(expectedOrderText);
     }
 
     @Test
@@ -79,63 +88,40 @@ public class OrderSimpleTest {
         WebDriver driver = new FirefoxDriver();
         // открытие главной страницы
         driver.get("https://qa-scooter.praktikum-services.ru/");
+        MainPage mainPage = new MainPage(driver);
+        OrderPage orderPage = new OrderPage(driver);
         // Находим кнопку
-        WebElement button = driver.findElement(By.cssSelector(".Button_Button__ra12g.Button_Middle__1CSJM"));
-
-        // Скроллим к кнопке
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block: 'center'});", button);
-
-        // Ждем и кликаем
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(button)).click();
-        // Поиск поля Имя с ожиданием и заполнение поля
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(
-                        By.xpath(".//div/input[contains(@placeholder,'Имя')]")
-                )).sendKeys("Иван");
-        // Поиск поля Фамилия  и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'Фамилия')]")
-        ).sendKeys("Иванов");
-        // Поиск поля Адрес  и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'Адрес')]")
-        ).sendKeys("Фрунзе, 8");
-        // Поиск поля Станция метро  и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'Станция метро')]")
-        ).sendKeys("Рижская");
-        // Ждем появления элементов списка и кликаем
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(By.className("Order_Text__2broi"))).click();
-        // Поиск поля Телефон и заполнение поля
-        driver.findElement(By.xpath(".//div/input[contains(@placeholder,'* Телефон: на него позвонит курьер')]")
-        ).sendKeys("89155151551");
-        // Ищем и жмем кнопку куки
-        driver.findElement(By.className("App_CookieButton__3cvqF")).click();
-        // Ищем и жмем кнопку далее
-        driver.findElement(By.xpath(".//div[starts-with(@class, 'Order_NextButton')]/button")).click();
-        // Ищем поля Календаря и вводим дату
-        WebElement dateField = new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable
-                        (By.xpath(".//div[starts-with(@class, 'react-datepicker__input-container')]//input")));
-        dateField.sendKeys("27.08.2025");
-        driver.findElement(By.className("Header_Header__214zg")).click();
+        mainPage.clickBodyOrderButton();
+        // Пишем Имя
+        orderPage.setName(name);
+        // Пишем Фамилию
+        orderPage.setSecondName(secondName);
+        // Пишем адрес
+        orderPage.setAdrdess(address);
+        // Выбираем станцию Метро
+        orderPage.setMetro(metro);
+        // Пишем номер
+        orderPage.setPhone(phone);
+        // Жмем кнопку куки
+        orderPage.clickCookie();
+        // Жмем кнопку далее
+        orderPage.clickGo();
+        // Пишем дату
+        orderPage.setData(date);
         // Ищем поле Срок аренды
-        driver.findElement(By.className("Dropdown-root")).click();
-        // выбираем срок аренды
-        driver.findElement(By.xpath("//div[@class='Dropdown-option' and text()='трое суток']")).click();
-        // Поле цвет самоката, выбираем цвет
-        driver.findElement(By.id("black")).click();
+        orderPage.setRent(rate);
+        // Выбор цвета
+        orderPage.setColor(color);
+        // Пишем комментарий
+        orderPage.setComment(comment);
         // Нажимаем на кнопку заказать
-        driver.findElement(By.xpath("//button[@class='Button_Button__ra12g Button_Middle__1CSJM' and text()='Заказать']")).click();
+        orderPage.clickOrder();
         // Подтверждаем заказ
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@class='Button_Button__ra12g Button_Middle__1CSJM' and text()='Да']"))).click();
-// Проверяем текст заголовка напрямую
-        assertTrue(new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        By.className("Order_Modal__YZ-d3")
-                )).isDisplayed());
+        orderPage.clickConfirmOrder();
+        // Проверяем что заказ оформлен
+        orderPage.checkingOrderPage(expectedOrderText);
     }
-
-
 }
+
+
+
