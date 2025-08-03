@@ -1,4 +1,5 @@
 package ru.practicum;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -6,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
+import static ru.practicum.EnvConfig.IMPLICITY_TIMEOUT;
 
 public class OrderPage {
     public OrderPage(WebDriver driver) {
@@ -46,11 +48,11 @@ public class OrderPage {
     // Локатор страницы подтверждения заказа
     private static final By CONFIRM_ORDER_PAGE = By.className("Order_Modal__YZ-d3");
     // Локатор заголовка заказа
-    private static final By HEADER_ORDER_PAGE = By.className("Order_ModalHeader__3FDaJ");
+    private static final By HEADER_ORDER_PAGE = By.xpath(".//div[starts-with(@class, 'Order_Modal')]//div[(starts-with(@class,'Order_ModalHeader'))]");
 
     // Поиск поля Имя с ожиданием и заполнение поля
     public void setName(String name) {
-        new WebDriverWait(driver, Duration.ofSeconds(10))
+        new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT))
                 .until(ExpectedConditions.elementToBeClickable(
                         NAME_FIELD)).sendKeys(name);
     }
@@ -68,7 +70,7 @@ public class OrderPage {
     // Поиск поля метро его заполнение и выбор из всплывающего списка
     public void setMetro(String metro) {
         driver.findElement(METRO).sendKeys(metro);
-        new WebDriverWait(driver, Duration.ofSeconds(10))
+        new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT))
                 .until(ExpectedConditions.elementToBeClickable(CLICK_STATION_METRO)).click();
     }
 
@@ -89,7 +91,7 @@ public class OrderPage {
 
     // Выбор Даты
     public void setData(String data) {
-        WebElement dateField = new WebDriverWait(driver, Duration.ofSeconds(10))
+        WebElement dateField = new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT))
                 .until(ExpectedConditions.elementToBeClickable
                         (DATA));
         dateField.sendKeys(data);
@@ -103,7 +105,7 @@ public class OrderPage {
         if (daysOfRent < 1 || daysOfRent >= options.size()) {
             return; // Просто выходим если индекс невалидный
         }
-        new WebDriverWait(driver, Duration.ofSeconds(10))
+        new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT))
                 .until(ExpectedConditions.elementToBeClickable(options.get(daysOfRent - 1)))
                 .click();
         // Выбор цвета
@@ -125,17 +127,24 @@ public class OrderPage {
 
     // Кликаем кнопку подтверждения заказа
     public void clickConfirmOrder() {
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(CONFIRM_ORDER_BUTTON)).click();
+
+        WebElement button = new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.elementToBeClickable(CONFIRM_ORDER_BUTTON));
+        button.click();
+        new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT))
+                .until(ExpectedConditions.invisibilityOf(button));
     }
 
-    public void checkingOrderPage(String confirmText) {
-        WebElement modal = new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.visibilityOfElementLocated(CONFIRM_ORDER_PAGE));
-                String headerText = modal.findElement(HEADER_ORDER_PAGE).getText();
-        if (!headerText.contains(confirmText)) {
-            return;
-        }
+    // Проверяем наличие заказа
+    public boolean checkingOrderPage(String confirmText) {
+
+        WebElement header = new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT))
+                .until(ExpectedConditions.visibilityOfElementLocated(HEADER_ORDER_PAGE));
+
+
+        String actualText = header.getText();
+
+        return actualText.equals(confirmText);
     }
 }
 

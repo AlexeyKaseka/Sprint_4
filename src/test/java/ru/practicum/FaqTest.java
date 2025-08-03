@@ -1,28 +1,29 @@
 package ru.practicum;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-
 import static org.junit.Assert.assertEquals;
 
 
-@RunWith(Enclosed.class)
-public class FaqTest {
+
+
+
+
 
     @RunWith(Parameterized.class)
-    public static class FaqParameterizedTest {
+    public class FaqTest {
+        @Rule
+        public DriverFactory factory = new DriverFactory();
 
         private final int questionIndex;
         private final String expectedQuestionText;
         private final String expectedAnswerText;
 
 
-        public FaqParameterizedTest(int questionIndex, String expectedQuestionText, String expectedText) {
+        public FaqTest(int questionIndex, String expectedQuestionText, String expectedText) {
             this.questionIndex = questionIndex;
             this.expectedQuestionText = expectedQuestionText;
             this.expectedAnswerText = expectedText;
@@ -45,12 +46,12 @@ public class FaqTest {
 
         @Test
         public void testFaqCorrectTextOnClick() {
-            // веб драйвер для Google Chrome
-            WebDriver driver = new FirefoxDriver();
-            // открытие главной страницы
-            driver.get("https://qa-scooter.praktikum-services.ru/");
+            WebDriver driver = factory.getDriver();
+
             // подключаем MainPage
             MainPage mainPage = new MainPage(driver);
+            // открытие главной страницы
+            mainPage.openMainPage();
             // скролл до списка
             mainPage.scrollToFaqQuestion(questionIndex);
             // получение тектса вопроса и сравнение
@@ -65,7 +66,7 @@ public class FaqTest {
                     mainPage.getFaqAnswerText(questionIndex));
         }
     }
-}
+
 
 
 

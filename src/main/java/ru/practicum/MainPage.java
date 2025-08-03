@@ -6,8 +6,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
+import static ru.practicum.EnvConfig.BASE_URL;
+import static ru.practicum.EnvConfig.IMPLICITY_TIMEOUT;
 
 // Класс Page Object для главной страницы
 public class MainPage {
@@ -30,6 +31,11 @@ public class MainPage {
     // Локатор ответа
     private static final By FAQ_ANSWER = By.xpath("//div[contains(@id, 'accordion__panel-')]");
 
+    // Открываем главную страницу
+    public void openMainPage() {
+        driver.get(BASE_URL);
+    }
+
     // Находим кнопку в шапке и нажимаем на нее
     public void clickHeaderOrderButton() {
         driver.findElement(BUTTON_HEAD_ORDER).click();
@@ -39,7 +45,7 @@ public class MainPage {
     public void clickBodyOrderButton() {
         WebElement button = driver.findElement(BUTTON_BODY_ORDER);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", button);
-        new WebDriverWait(driver, Duration.ofSeconds(10))
+        new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT))
                 .until(ExpectedConditions.elementToBeClickable(button)).click();
     }
 
@@ -61,7 +67,7 @@ public class MainPage {
 
     // Метод для получения текста ответа с ожиданием
     public String getFaqAnswerText(int index) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(IMPLICITY_TIMEOUT));
 
         WebElement answer = wait.until(
                 ExpectedConditions.visibilityOf(
