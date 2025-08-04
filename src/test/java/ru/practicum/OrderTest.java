@@ -7,6 +7,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 
+import static ru.practicum.OrderTestConstant.ALL_ORDER_TEST_CASES;
+
 
 @RunWith(Parameterized.class)
 public class OrderTest {
@@ -50,10 +52,7 @@ public class OrderTest {
                     "Ожидаемый текст: {9}")
 
     public static Object[][] testData() {
-        return new Object[][]{
-                {"Петя", "Петров", "Пролетарская, 8", "Рижская", "89166166116", "15.08.2025", 2, "black", "Все ок", "Заказ оформлен"},
-                {"Иван", "Иванов", "Мичурина, 16", "Комсомольская", "89156155116", "10.08.2025", 4, "grey", "Норм", "Заказ оформлен"},
-        };
+        return OrderTestConstant.ALL_ORDER_TEST_CASES;
     }
 
     @Test
@@ -99,10 +98,10 @@ public class OrderTest {
     @Test
     public void testCorrectPathOrderSecondButton() {
         WebDriver driver = factory.getDriver();
-        // открытие главной страницы
-        driver.get("https://qa-scooter.praktikum-services.ru/");
         MainPage mainPage = new MainPage(driver);
         OrderPage orderPage = new OrderPage(driver);
+        // открытие главной страницы
+        mainPage.openMainPage();
         // Находим кнопку
         mainPage.clickBodyOrderButton();
         // Пишем Имя
