@@ -38,7 +38,17 @@ public class OrderTest {
         this.expectedOrderText = expectedOrderText;
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name =
+            "Тест #{index}: " +
+                    "Пользователь: {0} {1} | " +
+                    "Адрес: {2} (м. {3}) | " +
+                    "Телефон: {4} | " +
+                    "Дата: {5} | " +
+                    "Аренда: {6} суток| " +
+                    "Цвет: {7} | " +
+                    "Комментарий: {8} | " +
+                    "Ожидаемый текст: {9}")
+
     public static Object[][] testData() {
         return new Object[][]{
                 {"Петя", "Петров", "Пролетарская, 8", "Рижская", "89166166116", "15.08.2025", 2, "black", "Все ок", "Заказ оформлен"},
