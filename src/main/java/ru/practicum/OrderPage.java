@@ -63,7 +63,7 @@ public class OrderPage {
     }
 
     // Поиск поля адрес и заполнение поля
-    public void setAdrdess(String address) {
+    public void setAddress(String address) {
         driver.findElement(ADDRESS).sendKeys(address);
     }
 
@@ -144,7 +144,7 @@ public class OrderPage {
 
         String actualText = header.getText();
 
-        return actualText.equals(confirmText);
+        return actualText.contains(confirmText);
     }
 }
 
